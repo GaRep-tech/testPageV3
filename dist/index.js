@@ -1,51 +1,35 @@
 import * as THREE from 'https://unpkg.com/three/build/three.module.js';
-import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+import {GLTFLoader} from './three/examples/jsm/loaders/GLTFLoader.js';
 
-import SceneInit from './SceneInit.js';
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.outputColorSpace = THREE.sRGBEncoding;
 
-const canvas = document.querySelector('.webgl');
-const scene = new THREE.Scene();
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setClearColor(0x000000);
 
-//Create a cube
-//const geometry = new THREE.BoxGeometry(1,1,1);
-//const material = new THREE.MeshBasicMaterial({color: 0xff0000});
-//const mesh = new THREE.Mesh(geometry, material);
-//scene.add(mesh);
+document.body.appendChild(renderer.domElement);
 
-function App(){
-    useEffect(() => {
-const test = new SceneInit(canvas);
-test.initialize();
-test.animate();
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth/ window.innerHeight, 0.1, 1000);
+camera.position.set(4,5,11);
+camera.lookAt(0,0,0);
 
+const groundGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
+groundGeometry.rotateX(-Math.PI / 2);
+const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide });
+const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
+Scene.add(groundMesh);
 
-const gltfLoader = new GLTFLoader();
-gltfLoader.load('./assets/Island_noRoad.glb', (gltfScene) => {
+const spotLight = new THREE.SpotLight(0xffffff, 3, 100, 0.2, 0.5);
+spotLight.position.set(5, 10, 5);
+scene.add(spotLight);
 
-    test.scene.add(gltfScene.scene);
+const loader = new GLTFLoader().setPath('testPageV3/assets/');
+loader.load('scene.gltf', (gltf)=> {
+    const mesh = gltf.scene;
+    mesh.position.set(0, 1.05, -1);
+    scene.add(mesh);
 });
-    }, [])
-}
-
-
-
-//"Boilerplate" code to create a scene, camera, and renderer
-const sizes = {
-    width:window.innerWidth,
-    height:window.innerHeight
-}
-
-const camera = new THREE.PerspectiveCamera(75, sizes.width/sizes.height, 0.1, 100);
-camera.position.set(0,1,2);
-scene.add(camera);
-
-const renderer = new THREE.WebGLRenderer({ 
-    canvas: canvas
-});
-
-renderer.setSize(sizes.width, sizes.height);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.shadowMap.enabled = true;
 
 function animate(){
     requestAnimationFrame(animate);
