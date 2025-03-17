@@ -1,12 +1,33 @@
 import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
+
+import SceneInit from './SceneInit.js';
+
 const canvas = document.querySelector('.webgl');
 const scene = new THREE.Scene();
 
 //Create a cube
-const geometry = new THREE.BoxGeometry(1,1,1);
-const material = new THREE.MeshBasicMaterial({color: 0xff0000});
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
+//const geometry = new THREE.BoxGeometry(1,1,1);
+//const material = new THREE.MeshBasicMaterial({color: 0xff0000});
+//const mesh = new THREE.Mesh(geometry, material);
+//scene.add(mesh);
+
+function App(){
+    useEffect(() => {
+const test = new SceneInit(canvas);
+test.initialize();
+test.animate();
+
+
+const gltfLoader = new GLTFLoader();
+gltfLoader.load('./assets/Island_noRoad.glb', (gltfScene) => {
+
+    test.scene.add(gltfScene.scene);
+});
+    }, [])
+}
+
+
 
 //"Boilerplate" code to create a scene, camera, and renderer
 const sizes = {
