@@ -1,80 +1,34 @@
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as THREE from 'three'
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x000000);
-renderer.setPixelRatio(window.devicePixelRatio);
-
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
+const w= window.innerWidth;
+const h= window.innerHeight;
+const renderer = new THREE.WebGLRenderer({antialias: true});
+renderer.setSize(w,h);
 document.body.appendChild(renderer.domElement);
+
+//creating camera, fields in parentheses are: fov, aspect ratio, near clipping plane, far clipping plane
+const camera = new THREE.PerspectiveCamera(75, w/h, 0.1, 1000);
+camera.position.z = 2;
 
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-camera.position.set(4, 5, 11);
+const geometry = new THREE.IcosahedronGeometry(1,3);
+//basic material is a material that is not affected by light, standard material is affected by light
+const material = new THREE.MeshStandardMaterial({color: 0x00ff00, wireframe: false, flatShading: true});
+const mesh = new THREE.Mesh(geometry, material);
+scene.add(mesh);
 
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.enablePan = false;
-controls.minDistance = 5;
-controls.maxDistance = 20;
-controls.minPolarAngle = 0.5;
-controls.maxPolarAngle = 1.5;
-controls.autoRotate = false;
-controls.target = new THREE.Vector3(0, 1, 0);
-controls.update();
-
-const groundGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
-groundGeometry.rotateX(-Math.PI / 2);
-const groundMaterial = new THREE.MeshStandardMaterial({
-  color: 0x555555,
-  side: THREE.DoubleSide
-});
-const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
-groundMesh.castShadow = false;
-groundMesh.receiveShadow = true;
-scene.add(groundMesh);
-
-const spotLight = new THREE.SpotLight(0xffffff, 3, 100, 0.22, 1);
-spotLight.position.set(0, 25, 0);
-spotLight.castShadow = true;
-spotLight.shadow.bias = -0.0001;
-scene.add(spotLight);
-
-const loader = new GLTFLoader();
-loader.load('./Island_noRoad/island.gltf', (gltf) => {
-  console.log('loading model');
-  const mesh = gltf.scene;
-
-  mesh.traverse((child) => {
-    if (child.isMesh) {
-      child.castShadow = true;
-      child.receiveShadow = true;
-    }
-  });
-
-  mesh.position.set(0, 1.05, -1);
-  scene.add(mesh);
+const hemiLight = new THREE.HemisphereLight(0xffffbb, 0x080820, );
+scene.add(hemiLight);
 
 
-});
-
-window.addEventListener('resize', () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
+function animate(){
+    requestAnimationFrame(animate);
+    mesh.rotation.x += 0.01;
+    mesh.rotation.y += 0.01;
+    renderer.render(scene, camera);
 }
 
 animate();
+
+renderer.render(scene, camera);
