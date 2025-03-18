@@ -62,11 +62,7 @@ loader.load('scene.gltf', (gltf) => {
   mesh.position.set(0, 1.05, -1);
   scene.add(mesh);
 
-  document.getElementById('progress-container').style.display = 'none';
-}, (xhr) => {
-  console.log(`loading ${xhr.loaded / xhr.total * 100}%`);
-}, (error) => {
-  console.error(error);
+
 });
 
 window.addEventListener('resize', () => {
