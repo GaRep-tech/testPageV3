@@ -21,19 +21,45 @@ const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
 Scene.add(groundMesh);
 
 const spotLight = new THREE.SpotLight(0xffffff, 3, 100, 0.2, 0.5);
-spotLight.position.set(5, 10, 5);
+spotLight.position.set(0, 25, 0);
 scene.add(spotLight);
+spotLight.castShadow = true;
+spotLight.shadow.bias = -0.0001;
 
-const loader = new GLTFLoader().setPath('testPageV3/assets/');
+const loader = new GLTFLoader().setPath('./assets/');
 loader.load('scene.gltf', (gltf)=> {
     const mesh = gltf.scene;
     mesh.position.set(0, 1.05, -1);
     scene.add(mesh);
-});
 
-function animate(){
+
+    mesh.traverse((child) => {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+    
+      mesh.position.set(0, 1.05, -1);
+      scene.add(mesh);
+    
+      document.getElementById('progress-container').style.display = 'none';
+    }, (xhr) => {
+      console.log(`loading ${xhr.loaded / xhr.total * 100}%`);
+    }, (error) => {
+      console.error(error);
+    });
+    
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+function animate() {
     requestAnimationFrame(animate);
+    controls.update();
     renderer.render(scene, camera);
-}
-
-animate();
+  }
+  
+  animate();
