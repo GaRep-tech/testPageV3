@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 
+//building a 3d shape
 const w= window.innerWidth;
 const h= window.innerHeight;
 const renderer = new THREE.WebGLRenderer({antialias: true});
